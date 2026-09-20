@@ -43,6 +43,16 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Validate each URL with a four-byte request; download nothing.",
     )
+
+    batch = subparsers.add_parser(
+        "batch",
+        help="Render one extracted Memories batch and write its metadata.",
+    )
+    batch.add_argument("--memories-dir", type=Path, required=True)
+    batch.add_argument("--history", type=Path, required=True)
+    batch.add_argument("--output-dir", type=Path, required=True)
+    batch.add_argument("--exiftool", type=Path, required=True)
+    batch.add_argument("--ffmpeg", default="ffmpeg")
     return parser
 
 
@@ -83,6 +93,22 @@ def main(argv=None):
     try:
         if args.command == "download":
             run_download(args)
+            return
+
+        if args.command == "batch":
+            from .batch_processor import process_batch
+
+            totals = process_batch(
+                args.memories_dir,
+                args.history,
+                args.output_dir,
+                args.exiftool,
+                args.ffmpeg,
+            )
+            print(
+                "\nBatch ready: "
+                + ", ".join(f"{key}={value}" for key, value in totals.items())
+            )
             return
 
         # Processing dependencies are deliberately loaded only for this mode,

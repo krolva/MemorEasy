@@ -1,4 +1,5 @@
 # Project-relevant files
+.DS_Store
 memories_history.html
 memories/
 
@@ -149,6 +150,8 @@ celerybeat.pid
 .venv
 export_urls.txt
 snapchat-exports/
+processing/
+completed-memories/
 env/
 venv/
 ENV/
