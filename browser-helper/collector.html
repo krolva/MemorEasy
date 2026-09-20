@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MemorEasy Export Link Collector</title>
+  <style>
+    :root { color-scheme: light dark; font-family: system-ui, sans-serif; }
+    body { max-width: 44rem; margin: 4rem auto; padding: 0 1.5rem; line-height: 1.55; }
+    .bookmarklet {
+      display: inline-block; padding: .8rem 1.1rem; border-radius: .6rem;
+      color: white; background: #1687ff; font-weight: 700; text-decoration: none;
+    }
+    code { overflow-wrap: anywhere; }
+    .warning { border-left: .3rem solid #f5a623; padding-left: 1rem; }
+  </style>
+</head>
+<body>
+  <h1>MemorEasy Export Link Collector</h1>
+  <p>
+    Drag the button below to your browser's bookmarks bar. Then open Snapchat's
+    <strong>Download My Data</strong> page, expand <strong>Your exports</strong>,
+    and click the bookmark.
+  </p>
+  <p>
+    <a class="bookmarklet" href="javascript:(()=>{const links=[...document.querySelectorAll('a[href]')].map(a=>a.href).filter(h=>{try{const u=new URL(h);return u.protocol==='https:'&&u.hostname==='storage.googleapis.com'&&u.pathname.toLowerCase().endsWith('.zip')&&u.searchParams.has('Expires')&&u.searchParams.has('GoogleAccessId')&&u.searchParams.has('Signature')}catch{return false}});const unique=[...new Set(links)].sort((a,b)=>{const n=u=>{const m=new URL(u).pathname.match(/(?:-(\d+))?\.zip$/i);return m&&m[1]?Number(m[1]):1};return n(a)-n(b)});if(!unique.length){alert('MemorEasy: no signed export ZIP links found. Expand Your exports first.');return}const blob=new Blob([unique.join('\n')+'\n'],{type:'text/plain'});const link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download='export_urls.txt';link.click();setTimeout(()=>URL.revokeObjectURL(link.href),1000);alert('MemorEasy: saved '+unique.length+' export links. Keep export_urls.txt private.');})()">Collect Snapchat exports</a>
+  </p>
+  <p class="warning">
+    <strong>Keep the resulting file private.</strong> Its temporary signed URLs
+    grant access to your Snapchat export until they expire. MemorEasy ignores
+    <code>export_urls.txt</code> in Git.
+  </p>
+  <p>
+    The collector runs entirely inside the current Snapchat page. It selects
+    only signed HTTPS ZIP links hosted on <code>storage.googleapis.com</code>,
+    removes duplicates, orders the numbered archives, and creates a local text
+    file. It makes no network requests of its own.
+  </p>
+</body>
+</html>

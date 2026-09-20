@@ -131,6 +131,14 @@ Copy each ZIP link into a private text file, one link per line, then run:
 python3 script.py download --url-file export_urls.txt
 ```
 
+For exports split into many archives, open
+[`browser-helper/collector.html`](browser-helper/collector.html) locally and
+drag its **Collect Snapchat exports** button to your bookmarks bar. On
+Snapchat's **Download My Data** page, expand **Your exports** and click the
+bookmark. It will create `export_urls.txt` containing every signed ZIP link in
+the correct numeric order. The collector runs locally in the Snapchat page and
+does not send the URLs anywhere.
+
 Before downloading tens of gigabytes, validate every temporary link with a
 four-byte request:
 
