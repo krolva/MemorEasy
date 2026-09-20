@@ -5,7 +5,12 @@ import unittest
 from unittest.mock import patch
 import zipfile
 
-from src.archive_downloader import download_archive, read_url_file, validate_urls
+from src.archive_downloader import (
+    download_archive,
+    probe_archive,
+    read_url_file,
+    validate_urls,
+)
 from src.exceptions import DownloadError
 
 
@@ -32,6 +37,19 @@ class FakeResponse(BytesIO):
 
 
 class ArchiveDownloaderTests(unittest.TestCase):
+    @patch("src.archive_downloader.urlopen")
+    def test_probe_reads_zip_signature(self, mocked_open):
+        mocked_open.return_value = FakeResponse(b"PK\x03\x04extra", status=206)
+        self.assertTrue(probe_archive("https://example.com/private-token"))
+        request = mocked_open.call_args.args[0]
+        self.assertEqual(request.headers["Range"], "bytes=0-3")
+
+    @patch("src.archive_downloader.urlopen")
+    def test_probe_rejects_non_zip_response(self, mocked_open):
+        mocked_open.return_value = FakeResponse(b"<htm", status=200)
+        with self.assertRaises(DownloadError):
+            probe_archive("https://example.com/expired")
+
     def test_url_file_ignores_comments_and_blanks(self):
         with TemporaryDirectory() as directory:
             path = Path(directory) / "urls.txt"

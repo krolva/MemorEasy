@@ -4,7 +4,7 @@ import traceback
 import sys
 
 from .exceptions import InvalidInputFileError, ParseError
-from .archive_downloader import download_archives, read_url_file
+from .archive_downloader import download_archives, probe_archives, read_url_file
 from .exceptions import DownloadError
 # =========================================================================== #
 
@@ -38,6 +38,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
     download.add_argument("--timeout", type=int, default=60)
     download.add_argument("--retries", type=int, default=3)
+    download.add_argument(
+        "--check-only",
+        action="store_true",
+        help="Validate each URL with a four-byte request; download nothing.",
+    )
     return parser
 
 
@@ -45,6 +50,10 @@ def run_download(args: argparse.Namespace) -> None:
     urls = list(args.url)
     if args.url_file:
         urls.extend(read_url_file(args.url_file))
+    if args.check_only:
+        checked = probe_archives(urls, timeout=args.timeout)
+        print(f"\nAll {checked} export link(s) are valid ZIP downloads.")
+        return
     results = download_archives(
         urls,
         args.output_dir,

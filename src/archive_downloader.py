@@ -22,6 +22,41 @@ class DownloadResult:
     downloaded: bool
 
 
+def probe_archive(url: str, *, timeout: int = 30) -> bool:
+    """Confirm a signed URL is reachable and begins with a ZIP signature."""
+    request = Request(
+        url,
+        headers={
+            "User-Agent": USER_AGENT,
+            "Range": "bytes=0-3",
+        },
+    )
+    try:
+        with urlopen(request, timeout=timeout) as response:
+            signature = response.read(4)
+    except (HTTPError, URLError, TimeoutError, OSError) as exc:
+        raise DownloadError(
+            "Export link could not be accessed. It may have expired: "
+            f"{exc}"
+        ) from exc
+
+    if signature != b"PK\x03\x04":
+        raise DownloadError(
+            "Export link did not return a ZIP file. It may have expired or "
+            "redirected to a login page."
+        )
+    return True
+
+
+def probe_archives(urls: Iterable[str], *, timeout: int = 30) -> int:
+    """Validate all signed URLs without downloading their archive bodies."""
+    validated = validate_urls(urls)
+    for index, url in enumerate(validated, start=1):
+        print(f"Checking export {index}/{len(validated)}...")
+        probe_archive(url, timeout=timeout)
+    return len(validated)
+
+
 def read_url_file(path: Path) -> list[str]:
     """Read one HTTPS export URL per line, ignoring blanks and comments."""
     urls = []

@@ -131,6 +131,13 @@ Copy each ZIP link into a private text file, one link per line, then run:
 python3 script.py download --url-file export_urls.txt
 ```
 
+Before downloading tens of gigabytes, validate every temporary link with a
+four-byte request:
+
+```sh
+python3 script.py download --url-file export_urls.txt --check-only
+```
+
 The archives are saved to `./snapchat-exports/` using stable names. Partial
 downloads are resumed when the server supports HTTP ranges, completed archives
 are reused, transient failures are retried, and every response is validated as
