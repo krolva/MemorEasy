@@ -147,6 +147,8 @@ celerybeat.pid
 .env
 .envrc
 .venv
+export_urls.txt
+snapchat-exports/
 env/
 venv/
 ENV/

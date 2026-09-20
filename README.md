@@ -118,6 +118,29 @@ TODO Add built with images
 <!-- GETTING STARTED -->
 ## Getting Started
 
+### Downloading Snapchat's export ZIP files
+
+Snapchat no longer includes per-Memory download API URLs in
+`memories_history.html`. MemorEasy therefore cannot recreate those removed
+links. It can, however, download the temporary ZIP links supplied by Snapchat
+when your account export is ready.
+
+Copy each ZIP link into a private text file, one link per line, then run:
+
+```sh
+python3 script.py download --url-file export_urls.txt
+```
+
+The archives are saved to `./snapchat-exports/` using stable names. Partial
+downloads are resumed when the server supports HTTP ranges, completed archives
+are reused, transient failures are retried, and every response is validated as
+a ZIP file. Signed export URLs are intentionally never printed. You can also
+provide links directly with repeated `--url` options, although a private URL
+file is safer because shell history may retain command-line arguments.
+
+Do not commit or share `export_urls.txt`; Snapchat export links may grant access
+to personal data and may expire.
+
 
 ### Prerequisites
 

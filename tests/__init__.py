@@ -1,0 +1,1 @@
+"""MemorEasy test suite."""
